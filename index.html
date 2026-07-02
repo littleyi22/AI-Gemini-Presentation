@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>從零開始的 AI 備課：聽得懂、跟得上、明天就能用的 Gemini 體驗課</title>
+    <!-- Google Fonts: Inter (Body) & Orbitron (Tech Heading) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* ==========================================================================
+           UI/UX Pro Max Lite - Dark Mode (Tech / Cyberpunk Vibe)
+           ========================================================================== */
+        :root {
+            --bg-dark: #0A0A0F;
+            --surface-color: rgba(18, 18, 26, 0.7); /* Glassmorphism background */
+            --surface-border: rgba(255, 255, 255, 0.1);
+            --text-primary: #FFFFFF;
+            --text-muted: #A1A1AA;
+            
+            /* Tech Accents */
+            --accent-cyan: #00D4FF;
+            --accent-purple: #B026FF;
+            --accent-green: #00FF88;
+            
+            --font-heading: 'Orbitron', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            
+            --slide-padding: 4rem;
+            --radius-card: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-body);
+            color: var(--text-primary);
+            overflow: hidden;
+            background-color: var(--bg-dark);
+            /* Background image set to the generated tech background */
+            background-image: url('tech_bg.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-blend-mode: overlay;
+        }
+
+        /* --------------------------------------------------------------------------
+           Slides Container
+           -------------------------------------------------------------------------- */
+        .slides-wrapper {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            /* Subtle overlay to ensure text readability over the tech background */
+            background: linear-gradient(to bottom right, rgba(10, 10, 15, 0.8), rgba(10, 10, 15, 0.4));
+        }
+
+        .slides {
+            display: flex;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            height: 100vh;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        
+        .slides::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* --------------------------------------------------------------------------
+           Individual Slide Styles
+           -------------------------------------------------------------------------- */
+        .slide {
+            flex: 0 0 100vw;
+            width: 100vw;
+            height: 100vh;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: var(--slide-padding);
+            position: relative;
+        }
+
+        .slide-content {
+            background: var(--surface-color);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            padding: 3rem 4rem;
+            border-radius: var(--radius-card);
+            border: 1px solid var(--surface-border);
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.1);
+            max-width: 1100px;
+            width: 100%;
+            /* Tech top border */
+            border-top: 4px solid var(--accent-cyan);
+            position: relative;
+        }
+
+        /* Glowing dots in corners */
+        .slide-content::before, .slide-content::after {
+            content: '';
+            position: absolute;
+            top: -4px;
+            width: 8px;
+            height: 8px;
+            background: var(--accent-cyan);
+            box-shadow: 0 0 10px var(--accent-cyan);
+        }
+        .slide-content::before { left: -4px; }
+        .slide-content::after { right: -4px; }
+
+        /* --------------------------------------------------------------------------
+           Typography
+           -------------------------------------------------------------------------- */
+        h1, h2, h3 {
+            font-family: var(--font-heading);
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            line-height: 1.3;
+            letter-spacing: 1px;
+        }
+
+        h1 { 
+            font-size: clamp(2.5rem, 6vw, 4rem); 
+            font-weight: 900; 
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+        }
+        h1 span {
+            font-family: var(--font-body);
+            color: var(--text-muted);
+            letter-spacing: 0;
+            text-shadow: none;
+        }
+        
+        h2 { 
+            font-size: clamp(2rem, 5vw, 3rem); 
+            color: var(--accent-cyan); 
+            text-transform: uppercase;
+        }
+        h3 { 
+            font-size: 1.8rem; 
+            color: var(--text-primary);
+            margin-top: 1rem; 
+            font-family: var(--font-body);
+            font-weight: 600;
+        }
+
+        p, li {
+            font-size: 1.5rem;
+            line-height: 1.8;
+            color: var(--text-muted);
+            margin-bottom: 1.2rem;
+        }
+
+        strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* --------------------------------------------------------------------------
+           Custom Elements
+           -------------------------------------------------------------------------- */
+        .hero-image {
+            max-width: 100%;
+            height: auto;
+            max-height: 35vh;
+            border-radius: var(--radius-card);
+            margin-bottom: 2rem;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            object-fit: cover;
+            border: 1px solid var(--surface-border);
+        }
+
+        /* Grid for 課程內容 */
+        .course-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .course-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .course-card:hover {
+            background: rgba(0, 212, 255, 0.08);
+            border-color: var(--accent-cyan);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 212, 255, 0.1);
+        }
+
+        .course-card h3 {
+            color: var(--accent-purple);
+            font-family: var(--font-heading);
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+            font-size: 1.5rem;
+        }
+
+        .course-card h4 {
+            color: var(--text-primary);
+            font-size: 1.3rem;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+        }
+
+        .course-card p {
+            font-size: 1.2rem;
+            margin-bottom: 0;
+            line-height: 1.6;
+        }
+
+        /* Lists */
+        ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        ul.tech-list li {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        ul.tech-list li::before {
+            content: '>';
+            color: var(--accent-cyan);
+            font-family: var(--font-heading);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+            font-size: 1.2rem;
+        }
+
+        .highlight-box {
+            background: rgba(176, 38, 255, 0.08);
+            border-left: 4px solid var(--accent-purple);
+            padding: 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1.5rem 0;
+        }
+
+        .highlight-box p { margin-bottom: 0; color: var(--text-primary); }
+
+        /* --------------------------------------------------------------------------
+           Navigation UI
+           -------------------------------------------------------------------------- */
+        .nav-controls {
+            position: fixed;
+            bottom: 2rem;
+            right: 3rem;
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            backdrop-filter: blur(5px);
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover {
+            background: var(--accent-cyan);
+            color: var(--bg-dark);
+            transform: scale(1.1);
+            box-shadow: 0 0 15px var(--accent-cyan);
+        }
+
+        /* --------------------------------------------------------------------------
+           Footer / Copyright
+           -------------------------------------------------------------------------- */
+        footer {
+            position: fixed;
+            bottom: 1rem;
+            left: 2rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            z-index: 100;
+            font-family: var(--font-body);
+            letter-spacing: 1px;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            width: 0%;
+            transition: width 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 0 10px var(--accent-cyan);
+        }
+
+        /* --------------------------------------------------------------------------
+           Responsive / Mobile View
+           -------------------------------------------------------------------------- */
+        @media (max-width: 768px) {
+            .slide {
+                padding: 1rem;
+            }
+            .slide-content {
+                padding: 1.5rem;
+                height: 90vh;
+                overflow-y: auto;
+            }
+            .course-grid {
+                grid-template-columns: 1fr;
+            }
+            h1 { font-size: 2.2rem; }
+            h2 { font-size: 1.8rem; }
+            p, li { font-size: 1.3rem; }
+            .nav-controls {
+                bottom: 1rem;
+                right: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+
+    <div class="slides-wrapper">
+        <div class="slides" id="slideContainer">
+            
+            <!-- Slide 1: Cover -->
+            <section class="slide">
+                <div class="slide-content" style="text-align: center; padding-top: 2rem;">
+                    <!-- 首頁主視覺圖片 -->
+                    <img src="001.png" alt="分享會主視覺" class="hero-image">
+                    <h1>從零開始的 AI 備課：<br><span style="font-size: 0.65em;">聽得懂、跟得上、明天就能用的 Gemini 體驗課</span></h1>
+                    <p style="margin-top: 1rem; font-size: 1.3rem; color: var(--accent-cyan); font-family: var(--font-heading); text-transform: uppercase;">// 教學現場實戰指南 //</p>
+                </div>
+            </section>
+
+            <!-- Slide 2: 課程內容 (Overview) -->
+            <section class="slide">
+                <div class="slide-content">
+                    <h2>課程內容</h2>
+                    <div class="course-grid">
+                        <div class="course-card">
+                            <h3>單元一：認識 Gemini 的模型</h3>
+                            <h4>Gemini 模型特性與教學使用時機</h4>
+                            <p>區分 Flash 與 Pro 模型，理解「快思」與「慢想」的課堂應用。</p>
+                        </div>
+                        <div class="course-card">
+                            <h3>單元二：與 AI 精準溝通的藝術</h3>
+                            <h4>國中小教師必學的提示詞工程</h4>
+                            <p>掌握「角色-任務-情境-格式」的教師專用提示詞架構，拒絕無效提問。</p>
+                        </div>
+                        <div class="course-card">
+                            <h3>單元三：打造專屬教學助手</h3>
+                            <h4>自訂 Gem（客製化機器人）設計方式</h4>
+                            <p>學會將常用的提示詞公式「打包」成專屬 Gem，實現一鍵自動化備課。</p>
+                        </div>
+                        <div class="course-card" style="border-color: var(--accent-purple);">
+                            <h3 style="color: var(--accent-cyan);">總結與 QA</h3>
+                            <h4>經驗分享與延伸資源提供</h4>
+                            <p>現場交流實作心得，解答課堂導入的各種疑難雜症。</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 3: 單元一 Gemini Flash & Pro -->
+            <section class="slide">
+                <div class="slide-content">
+                    <h2>單元一：認識 Gemini 的模型</h2>
+                    <ul class="tech-list">
+                        <li><strong>Gemini Flash —— 班上的「課堂搶答王」</strong>
+                            <p>規則固定、答案明確的快速任務。適用：課堂破冰遊戲設計、生字造句快速生成、長篇研習公文抓重點。</p>
+                        </li>
+                        <li style="margin-top: 2rem;"><strong>Gemini Pro —— 聯賽的「金牌策略教練」</strong>
+                            <p>運籌帷幄、擅長層層解謎（延長思考 Deep Think）。適用：跨領域核心素養命題、整學期的主題式探究教案、親師衝突個案的長期溝通策略。</p>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Slide 4: 單元二 RTC-CF -->
+            <section class="slide">
+                <div class="slide-content">
+                    <h2>單元二：與 AI 精準溝通的藝術</h2>
+                    <p>高效提示詞的五大核心要素 (RTC-CF 框架)</p>
+                    <ul class="tech-list" style="margin-top: 1rem;">
+                        <li><strong>角色 (Role)：</strong> 設定 AI 的專業身份</li>
+                        <li><strong>任務 (Task)：</strong> 具體命令執行的教學或行政動作</li>
+                        <li><strong>背景 (Context)：</strong> 提供任務所需的上下文（學生年級、程度）</li>
+                        <li><strong>限制條件 (Constraints)：</strong> 規範輸出的邊界（避免無關內容）</li>
+                        <li><strong>輸出格式 (Format)：</strong> 指定最終呈現的版面（表格、特定檔）</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Slide 5: 進階神技 -->
+            <section class="slide">
+                <div class="slide-content">
+                    <h2>單元二：進階實戰策略</h2>
+                    <ul class="tech-list">
+                        <li><strong>少樣本提示 (Few-Shot Prompting)</strong>
+                            <p>在提示詞中提供真實範例。讓 AI 完美模仿你的評語風格（例如：聯絡簿評語自動化）。</p>
+                        </li>
+                        <li style="margin-top: 2rem;"><strong>思維鏈提示 (Chain-of-Thought)</strong>
+                            <p>要求 AI「一步一步思考」並列出推論過程。用於破解複雜的跨領域命題，提升素養題組的嚴謹度。</p>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Slide 6: 單元三 Gem -->
+            <section class="slide">
+                <div class="slide-content">
+                    <h2>單元三：打造專屬教學助手</h2>
+                    <p>把完美的「提示詞框架」永久固定，變成免安裝的一鍵自動化工具。</p>
+                    
+                    <div class="highlight-box">
+                        <p><strong>Gem 的三步建構法：</strong></p>
+                        <ol style="margin-left: 1.5rem; color: var(--text-primary); margin-top: 0.5rem; line-height: 1.8;">
+                            <li><strong>為 Gem 命名：</strong> 功能明確（如：親師溝通助手）</li>
+                            <li><strong>設定指令 (Instructions)：</strong> 套用 RTC-CF 框架</li>
+                            <li><strong>規範工作流程：</strong> 步驟化指示 AI 該做什麼</li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+            
+        </div>
+    </div>
+
+    <!-- Navigation Controls -->
+    <div class="nav-controls" style="align-items: center;">
+        <a href="materials.html" class="nav-btn" style="width: auto; padding: 0 1.5rem; border-radius: 25px; text-decoration: none; font-size: 1.2rem; font-family: var(--font-body); font-weight: 600;" title="開啟網頁版教材與工具包">📚 網頁版教材資源庫</a>
+        <button class="nav-btn" id="prevBtn" title="上一頁 (左方向鍵)">&#8592;</button>
+        <button class="nav-btn" id="nextBtn" title="下一頁 (右方向鍵)">&#8594;</button>
+    </div>
+
+    <!-- 專屬助手版權宣告 -->
+    <footer>
+        © 2026 奕鈞老師 版權所有 | 版本：v.1.2
+    </footer>
+
+    <!-- Interactive Script -->
+    <script>
+        const container = document.getElementById('slideContainer');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const progressBar = document.getElementById('progressBar');
+
+        function updateProgress() {
+            const scrollLeft = container.scrollLeft;
+            const maxScroll = container.scrollWidth - container.clientWidth;
+            const progress = maxScroll > 0 ? (scrollLeft / maxScroll) * 100 : 0;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        function scrollNext() { container.scrollBy({ left: window.innerWidth, behavior: 'smooth' }); }
+        function scrollPrev() { container.scrollBy({ left: -window.innerWidth, behavior: 'smooth' }); }
+
+        nextBtn.addEventListener('click', scrollNext);
+        prevBtn.addEventListener('click', scrollPrev);
+        container.addEventListener('scroll', updateProgress);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                scrollNext();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                scrollPrev();
+            }
+        });
+
+        // Initialize progress bar
+        setTimeout(updateProgress, 100);
+    </script>
+</body>
+</html>

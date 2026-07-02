@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>網頁版教材 - 從零開始的 AI 備課</title>
+    <!-- Google Fonts: Inter (Body) & Orbitron (Tech Heading) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0A0A0F;
+            --surface-color: rgba(18, 18, 26, 0.85);
+            --surface-border: rgba(255, 255, 255, 0.1);
+            --text-primary: #FFFFFF;
+            --text-muted: #A1A1AA;
+            
+            --accent-cyan: #00D4FF;
+            --accent-purple: #B026FF;
+            --accent-green: #00FF88;
+            
+            --font-heading: 'Orbitron', sans-serif;
+            --font-body: 'Inter', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-body);
+            color: var(--text-primary);
+            background-color: var(--bg-dark);
+            background-image: url('tech_bg.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-blend-mode: overlay;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Navbar / Header */
+        header {
+            text-align: center;
+            margin-bottom: 4rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--surface-border);
+        }
+        
+        header h1 {
+            font-family: var(--font-heading);
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            color: var(--accent-cyan);
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+            margin-bottom: 1rem;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.8rem 1.5rem;
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .back-btn:hover {
+            background: var(--accent-cyan);
+            color: var(--bg-dark);
+            box-shadow: 0 0 15px var(--accent-cyan);
+        }
+
+        /* Sections */
+        section {
+            margin-bottom: 5rem;
+            background: var(--surface-color);
+            backdrop-filter: blur(12px);
+            padding: 3rem;
+            border-radius: 16px;
+            border: 1px solid var(--surface-border);
+            border-top: 4px solid var(--accent-purple);
+        }
+
+        section h2 {
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            color: var(--accent-purple);
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        section.cyan-theme { border-top-color: var(--accent-cyan); }
+        section.cyan-theme h2 { color: var(--accent-cyan); }
+
+        section.green-theme { border-top-color: var(--accent-green); }
+        section.green-theme h2 { color: var(--accent-green); }
+
+        /* Grid Layouts */
+        .grid-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-cyan);
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .card h3 {
+            color: var(--text-primary);
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .card p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            flex-grow: 1;
+            margin-bottom: 1.5rem;
+        }
+
+        .card .btn {
+            display: inline-block;
+            text-align: center;
+            padding: 0.6rem 1rem;
+            background: var(--text-primary);
+            color: var(--bg-dark);
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        .card .btn:hover { background: var(--accent-cyan); }
+
+        /* Prompt Blocks */
+        .prompt-block {
+            background: rgba(0, 0, 0, 0.5);
+            border-left: 4px solid var(--accent-cyan);
+            padding: 1.5rem;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 1.5rem;
+        }
+
+        .prompt-block h4 {
+            color: var(--accent-cyan);
+            margin-bottom: 0.8rem;
+            font-size: 1.2rem;
+        }
+
+        .prompt-block p, .prompt-block li {
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin-bottom: 0.5rem;
+        }
+        
+        .prompt-block code {
+            display: block;
+            background: rgba(255,255,255,0.1);
+            padding: 1rem;
+            border-radius: 6px;
+            color: #E0E0E0;
+            margin-top: 1rem;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--surface-border);
+            margin-top: 4rem;
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            section { padding: 1.5rem; }
+            header h1 { font-size: 2rem; }
+            section h2 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>網頁版教材資源庫</h1>
+        <p>從零開始的 AI 備課：聽得懂、跟得上、明天就能用的 Gemini 體驗課</p>
+        <a href="index.html" class="back-btn">← 返回簡報首頁</a>
+    </header>
+
+    <!-- 專屬 Gem 工具區 -->
+    <section class="cyan-theme">
+        <h2>🚀 教學專屬 Gem & AI 助手</h2>
+        <div class="grid-cards">
+            <div class="card">
+                <h3>馴獸師 溝通助手</h3>
+                <p>應對學生頂嘴、師生溝通引導的專屬對話助理。</p>
+                <a href="https://gemini.google.com/gem/1DXe1xtpphKFuSdXYb_feMag3Oh9cDfCu?usp=sharing" target="_blank" class="btn">開啟 Gem</a>
+            </div>
+            <div class="card">
+                <h3>親師溝通專家</h3>
+                <p>運用「三明治溝通法」自動產生溫暖、誠懇的聯絡簿留言。</p>
+                <a href="https://gemini.google.com/gem/1Q4upF5Y9gmuDXrkNNJT8ENv0Re24GrC-?usp=sharing" target="_blank" class="btn">開啟 Gem</a>
+            </div>
+            <div class="card">
+                <h3>PIRLS 四層次選擇題</h3>
+                <p>快速根據教材生成符合 PIRLS 閱讀理解四層次的國文選擇題。</p>
+                <a href="https://gemini.google.com/gem/1_xsLjW704YZ9Me0encYKaAAIetIQqcSj?usp=sharing" target="_blank" class="btn">開啟 Gem</a>
+            </div>
+            <div class="card">
+                <h3>段考審題機器人</h3>
+                <p>自動協助審視試題難易度與邏輯，把關段考品質。</p>
+                <a href="https://gemini.google.com/gem/1uN2WqAZF5Yzo2_FTnUSZQi6lMsrGmGmZ?usp=sharing" target="_blank" class="btn">開啟 Gem</a>
+            </div>
+            <div class="card">
+                <h3>教案產生器</h3>
+                <p>輸入年級、單元，快速產出符合素養導向的教學活動設計。</p>
+                <a href="https://gemini.google.com/gem/1-nuEwL7tUxQRVoLhklHK0XCyxj5Va0zD?usp=sharing" target="_blank" class="btn">開啟 Gem</a>
+            </div>
+            <div class="card">
+                <h3>生成圖片專用 Gem</h3>
+                <p>輸入情境即可生成適合考卷的黑白線條圖或教學用圖。</p>
+                <a href="https://gemini.google.com/gem/1ycytx8L7pWjVKbmokTY_8ebPzGhtayWx?usp=sharing" target="_blank" class="btn">開啟 Gem</a>
+            </div>
+            <div class="card" style="border-color: #00E676;">
+                <h3 style="color: #00E676;">CE 小助手 (LINE版)</h3>
+                <p>您的隨身小秘書！支援所有 CE2 功能、排程與記憶功能。</p>
+                <a href="http://line.ce2.ai/" target="_blank" class="btn" style="background: #00E676;">加入 LINE</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 實用工具包 -->
+    <section class="purple-theme">
+        <h2>🎒 教學與命題工具包</h2>
+        <div class="grid-cards">
+            <div class="card">
+                <h3>班級經營工具包</h3>
+                <p>彙整各種班級管理與互動模組。</p>
+                <a href="https://sites.google.com/view/class-management-kit/%E9%A6%96%E9%A0%81" target="_blank" class="btn">前往工具包</a>
+            </div>
+            <div class="card">
+                <h3>AI語文練功坊</h3>
+                <p>針對段落摘要、寫作引導的語文學習平台。</p>
+                <a href="https://sites.google.com/view/paragraph-summary/%E9%A6%96%E9%A0%81" target="_blank" class="btn">前往工具包</a>
+            </div>
+            <div class="card">
+                <h3>命題工具包</h3>
+                <p>各科素養題型、選擇題與非選題輔助命題資源。</p>
+                <a href="https://sites.google.com/view/proposition-tool/" target="_blank" class="btn">前往工具包</a>
+            </div>
+            <div class="card">
+                <h3>彈性課程計畫產生器</h3>
+                <p>輕鬆設計固定格式的彈性課程表單與計畫。</p>
+                <a href="https://sites.google.com/view/official-documents-generator/%E9%A6%96%E9%A0%81" target="_blank" class="btn">前往工具包</a>
+            </div>
+            <div class="card">
+                <h3>Typeless 語音輸入法</h3>
+                <p>極致精準的 AI 語音轉文字工具，備課打字更省力。</p>
+                <a href="https://www.typeless.com/refer?code=VGC7W3U" target="_blank" class="btn">前往下載</a>
+            </div>
+            <div class="card">
+                <h3>操作演示鍵盤</h3>
+                <p>線上虛擬鍵盤，方便在螢幕錄影或投影時展示快捷鍵操作。</p>
+                <a href="https://www.djes.tyc.edu.tw/canva123/tools/tool_keyboard/keyboard/index.html" target="_blank" class="btn">開啟鍵盤</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 提示詞大全 -->
+    <section class="green-theme">
+        <h2>📝 提示詞 (Prompt) 範本精華</h2>
+        
+        <div class="prompt-block">
+            <h4>【教師專用】RTC-CF 框架</h4>
+            <p><strong>角色 (Role):</strong> 你是一位精通 108 課綱、擅長引導學生思考的國中語文資深教師。<br>
+            <strong>任務 (Task):</strong> 請針對《木蘭詩》這一課，設計一個適合分組討論的課堂導學問題清單。<br>
+            <strong>背景 (Context):</strong> 對象是國一學生。<br>
+            <strong>限制條件 (Constraints):</strong> 使用有層次的提問法，產出10題問答題的學習單，包含學生座號姓名。<br>
+            <strong>輸出格式 (Format):</strong> 請以表格形式呈現，欄位包含：討論題號、導學問題、設計意圖、引導提示。</p>
+        </div>
+
+        <div class="prompt-block">
+            <h4>【命題專用】生成測驗題 (PIRLS 四層次)</h4>
+            <code>你是一個資深的國中國文老師。請根據我上傳的教材內容，生成閱讀理解PIRLS四層次的選擇題。學生程度：國中一年級。
+1. 一、二階層各兩題
+2. 三、四階層各三題
+每個選項的文字長度要一致，或者是相差不大；錯誤的選項必須具有誘答力，正確答案隨機分佈。</code>
+        </div>
+
+        <div class="prompt-block">
+            <h4>【命題專用】改寫素養題</h4>
+            <code>你是一個資深的國中國文老師。請根據我上傳的教材內容或題目，改寫成符合 108 課綱的素養導向命題方式的選擇題。學生程度：國中一年級。</code>
+        </div>
+
+        <div class="prompt-block">
+            <h4>【製圖專用】考卷專用圖片提示詞</h4>
+            <code>生成一張中國甲骨文的圖片。龜殼上有甲骨文。黑白線條圖，不著色，背景空白。</code>
+        </div>
+        
+        <div class="prompt-block">
+            <h4>【修圖專用】修改課本圖片出題</h4>
+            <code>請幫我修改這張圖片，將它改成黑白線條無著色，無明暗變化，背景白色簡單。
+主標題：民國113 年臺灣主要經貿伙伴及其進、出口貿易值比例圖
+請將：
+1. 中國（含香港）的文字改成「甲國」
+2. 美國的文字改成「乙國」
+3. 東南亞國家的文字改成「丙國」
+4. 日本的文字改成「丁國」
+將出口綠色改為灰色、將進口紅色改為無顏色。</code>
+        </div>
+        
+        <div class="prompt-block">
+            <h4>【Gem 客製化心法】</h4>
+            <p>與 Gemini 討論產出結果後，下達以下指令將其固化為系統提示詞：<br>
+            1. 「請幫我將上述文字轉為 YAML 格式 (MarkDown 格式)」<br>
+            2. 「我要設計一個 Gem 的命令，目的是______，當我輸入______你就會生成______給我。」</p>
+        </div>
+    </section>
+
+    <!-- 講師資訊 -->
+    <section>
+        <h2>👨‍🏫 關於講師</h2>
+        <div class="grid-cards" style="grid-template-columns: 1fr;">
+            <div class="card" style="align-items: center; text-align: center;">
+                <h3 style="font-size: 1.8rem; margin-bottom: 1rem;">「奕鈞老師」粉絲專頁</h3>
+                <p>分享最新教學心得、AI 備課技巧與教育現場點滴。</p>
+                <a href="https://www.facebook.com/share/1K5MsceXxS/?mibextid=wwXIfr" target="_blank" class="btn" style="width: 200px;">追蹤粉絲專頁</a>
+            </div>
+        </div>
+    </section>
+</div>
+
+<footer>
+    © 2026 奕鈞老師 版權所有 | 版本：v.1.0
+</footer>
+
+</body>
+</html>
